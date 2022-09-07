@@ -8,6 +8,10 @@
 import Foundation
 
 struct NetworkWeatherManager {
+    
+    // Передаем модель во ViewController
+    var onCompletion: ((WeatherIncomeModel) -> Void)?
+    
     func fetchCurrentWeather(forCity city: String) {
         let urlString = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=\(apiKey)"
         
@@ -16,7 +20,9 @@ struct NetworkWeatherManager {
         let task = session.dataTask(with: url) { data, responce, error in
             if let jsonData = data {
                 // Создаем объект на основе спарсенных данных из JSON, приведенный к нашей модели для обновления интерфейса
-                let weather = self.parseJSON(withData: jsonData)
+                if let weatherIncomeModel = self.parseJSON(withData: jsonData) {
+                    self.onCompletion?(weatherIncomeModel)
+                }
             }
         }
         task.resume()

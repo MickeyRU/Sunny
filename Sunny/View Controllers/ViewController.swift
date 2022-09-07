@@ -14,16 +14,18 @@ class ViewController: UIViewController {
     @IBOutlet weak var temperatureLabel: UILabel!
     @IBOutlet weak var feelsLikeTemperatureLabel: UILabel!
     
-    let networkWeatherManager = NetworkWeatherManager()
+    var networkWeatherManager = NetworkWeatherManager()
     
     @IBAction func searchPressed(_ sender: UIButton) {
         self.presentSearchAlertController(withTitle: "Enter city name", message: nil, style: .alert) {city in
-            self.networkWeatherManager.fetchCurrentWeather(forCity: city)
+            self.networkWeatherManager.fetchCurrentWeather(forCity: city) 
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        networkWeatherManager.onCompletion = { weatherIncomeModel in
+        }
         networkWeatherManager.fetchCurrentWeather(forCity: "London")
     }
 }
