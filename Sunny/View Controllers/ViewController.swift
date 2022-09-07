@@ -17,15 +17,26 @@ class ViewController: UIViewController {
     var networkWeatherManager = NetworkWeatherManager()
     
     @IBAction func searchPressed(_ sender: UIButton) {
-        self.presentSearchAlertController(withTitle: "Enter city name", message: nil, style: .alert) {city in
+        self.presentSearchAlertController(withTitle: "Enter city name", message: nil, style: .alert) {[unowned self] city in
             self.networkWeatherManager.fetchCurrentWeather(forCity: city) 
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        networkWeatherManager.onCompletion = { weatherIncomeModel in
+        networkWeatherManager.onCompletion = { [weak self] weatherIncomeModel in
+            guard let self = self else { return }
+            self.updateInterfaceWith(weather: weatherIncomeModel)
         }
         networkWeatherManager.fetchCurrentWeather(forCity: "London")
+    }
+    
+    func updateInterfaceWith(weather: WeatherIncomeModel) {
+        DispatchQueue.main.async {
+            self.cityLabel.text = weather.cityName
+            self.temperatureLabel.text = weather.temperatureString
+            self.feelsLikeTemperatureLabel.text = weather.feelsLikeTemperatureString
+            self.weatherIconImageView.image = UIImage(systemName: weather.systemIconNameString)
+        }
     }
 }
