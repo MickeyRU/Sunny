@@ -15,20 +15,22 @@ struct NetworkWeatherManager {
         let session = URLSession(configuration: .default)
         let task = session.dataTask(with: url) { data, responce, error in
             if let jsonData = data {
-                self.parseJSON(withData: jsonData)
+                // Создаем объект на основе спарсенных данных из JSON, приведенный к нашей модели для обновления интерфейса
+                let weather = self.parseJSON(withData: jsonData)
             }
         }
         task.resume()
     }
     
-    func parseJSON(withData data: Data){
+    func parseJSON(withData data: Data) -> WeatherIncomeModel?{
         let decoder = JSONDecoder()
         do {
-            let weather = try decoder.decode(WeatherIncomeModelData.self, from: data)
-            print(weather.main.temp)
+            let WeatherIncomeModelData = try decoder.decode(WeatherIncomeModelData.self, from: data)
+            guard let WeatherIncomeModel = WeatherIncomeModel(weatherIncomeModelData: WeatherIncomeModelData) else { return nil }
+            return WeatherIncomeModel
         } catch let error as NSError {
           print(error.localizedDescription)
         }
+        return nil
     }
-    
 }
